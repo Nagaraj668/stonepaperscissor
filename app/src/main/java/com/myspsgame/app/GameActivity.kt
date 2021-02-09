@@ -21,6 +21,8 @@ class GameActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("game_requests")
                 .child(gameReq.uid!!)
                 .removeValue()
+        } else {
+
         }
     }
 }

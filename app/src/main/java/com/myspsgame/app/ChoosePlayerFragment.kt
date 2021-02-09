@@ -156,7 +156,7 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
                 ).show()
 
                 val intent = Intent(activity, PendingGameAckActivity::class.java)
-                intent.putExtra("player_uid", onlinePlayer.uid)
+                intent.putExtra("game_request", Gson().toJson(gameRequest))
                 startActivity(intent)
             }
     }

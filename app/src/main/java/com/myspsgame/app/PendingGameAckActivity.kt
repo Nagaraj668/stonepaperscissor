@@ -1,13 +1,15 @@
 package com.myspsgame.app
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.*
+import com.google.gson.Gson
 
 class PendingGameAckActivity : AppCompatActivity() {
 
-    private lateinit var playerUid: String
+    private lateinit var gameRequest: GameRequest
     private lateinit var gameReqRef: DatabaseReference
 
     private val ackValueListener = object : ValueEventListener {
@@ -29,21 +31,29 @@ class PendingGameAckActivity : AppCompatActivity() {
     }
 
     private fun declined() {
-        Toast.makeText(applicationContext, "declined", Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, "Request declined", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     private fun acknowledged() {
-        Toast.makeText(applicationContext, "acknowledged", Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, "Game started", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, GameActivity::class.java)
+        intent.putExtra("game_request", Gson().toJson(gameRequest))
+        startActivity(intent)
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pending_game_ack)
 
-        playerUid = intent.getStringExtra("player_uid").toString()
-        println("playerUid: $playerUid")
+        gameRequest = Gson().fromJson(
+            intent.getStringExtra("game_request").toString(),
+            GameRequest::class.java
+        )
+
         gameReqRef = FirebaseDatabase.getInstance().getReference("game_requests")
-            .child(playerUid).child("ack")
+            .child(gameRequest.uid!!).child("ack")
     }
 
     override fun onStart() {
