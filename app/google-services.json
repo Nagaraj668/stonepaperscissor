@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "257502482047",
+    "project_id": "myspsgame-5ac2f",
+    "storage_bucket": "myspsgame-5ac2f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257502482047:android:9a95fdd8955c1c2d05b94a",
+        "android_client_info": {
+          "package_name": "com.myspsgame.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "257502482047-t8ii4f1e1k2kfnvcqk9ib1imir1mut8p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzq30QNINYBTG22f_YFNk7cFJgYE-kDIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "257502482047-t8ii4f1e1k2kfnvcqk9ib1imir1mut8p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
