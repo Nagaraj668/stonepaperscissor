@@ -10,7 +10,9 @@ import com.google.gson.Gson
 class PendingGameAckActivity : AppCompatActivity() {
 
     private lateinit var gameRequest: GameRequest
-    private lateinit var gameReqRef: DatabaseReference
+    private lateinit var gameAckRef: DatabaseReference
+    private lateinit var gameIdRef: DatabaseReference
+
 
     private val ackValueListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -30,6 +32,28 @@ class PendingGameAckActivity : AppCompatActivity() {
         }
     }
 
+    private val gameIdValueListener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val gameId = snapshot.getValue(String::class.java)
+
+            if (gameId != null) {
+                startGaming(gameId)
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            println(error.message)
+        }
+    }
+
+    private fun startGaming(gameId: String) {
+        gameRequest.gameId = gameId
+        val intent = Intent(this, GameActivity::class.java)
+        intent.putExtra("game_request", Gson().toJson(gameRequest))
+        startActivity(intent)
+        finish()
+    }
+
     private fun declined() {
         Toast.makeText(applicationContext, "Request declined", Toast.LENGTH_SHORT).show()
         finish()
@@ -37,10 +61,6 @@ class PendingGameAckActivity : AppCompatActivity() {
 
     private fun acknowledged() {
         Toast.makeText(applicationContext, "Game started", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, GameActivity::class.java)
-        intent.putExtra("game_request", Gson().toJson(gameRequest))
-        startActivity(intent)
-        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,17 +72,22 @@ class PendingGameAckActivity : AppCompatActivity() {
             GameRequest::class.java
         )
 
-        gameReqRef = FirebaseDatabase.getInstance().getReference("game_requests")
+        gameAckRef = FirebaseDatabase.getInstance().getReference("game_requests")
             .child(gameRequest.uid!!).child("ack")
+
+        gameIdRef = FirebaseDatabase.getInstance().getReference("game_requests")
+            .child(gameRequest.uid!!).child("gameId")
     }
 
     override fun onStart() {
         super.onStart()
-        gameReqRef.addValueEventListener(ackValueListener)
+        gameAckRef.addValueEventListener(ackValueListener)
+        gameIdRef.addValueEventListener(gameIdValueListener)
     }
 
     override fun onStop() {
         super.onStop()
-        gameReqRef.removeEventListener(ackValueListener)
+        gameAckRef.removeEventListener(ackValueListener)
+        gameIdRef.removeEventListener(gameIdValueListener)
     }
 }

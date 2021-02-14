@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Store Paper Scissor</string>
+    <string name="app_name">Stone Paper Scissor</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -14,4 +14,12 @@
     <string name="play">Play</string>
     <string name="waiting">Waiting for Plalyer..</string>
     <string name="requests">Requests</string>
+    <string name="stone">Stone</string>
+    <string name="scissor">Scissor</string>
+    <string name="paper">Paper</string>
+    <string name="status">Status</string>
+    <string name="your_choice">Your Choice</string>
+    <string name="opponent_choice">Opponent Choice</string>
+    <string name="points">0</string>
+    <string name="star">****</string>
 </resources>

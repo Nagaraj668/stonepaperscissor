@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.gson.Gson
@@ -31,7 +32,7 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
     lateinit var playersList: MutableList<OnlinePlayer>
 
     lateinit var playersOnlineRef: DatabaseReference
-    lateinit var playerRequestReference: DatabaseReference
+    var playerRequestReference: DatabaseReference? = null
     lateinit var firebaseAuth: FirebaseAuth
 
     private val reqListener = object : ValueEventListener {
@@ -39,12 +40,13 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
             val gameRequest = dataSnapshot.getValue(GameRequest::class.java)
 
             println("gameRequest?.ack: ${gameRequest?.ack}")
+            println("gameRequest?.game key: ${gameRequest?.gameId}")
 
             if (gameRequest?.ack != null) {
                 if (gameRequest?.ack!!) {
                     startGaming(gameRequest)
                 }
-            } else if (gameRequest != null) {
+            } else if (gameRequest != null && gameRequest.gameId == null) {
                 showIncomingRequestPopup(gameRequest)
             }
         }
@@ -79,7 +81,7 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
     private fun listenForRequests(uid: String) {
         playerRequestReference = FirebaseDatabase.getInstance().getReference("game_requests")
             .child(uid)
-        playerRequestReference.addValueEventListener(reqListener)
+        playerRequestReference!!.addValueEventListener(reqListener)
     }
 
     private fun startGaming(gameRequest: GameRequest) {
@@ -91,7 +93,7 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
 
     private fun showIncomingRequestPopup(gameRequest: GameRequest?) {
         val alertDialogBuilder: AlertDialog.Builder = AlertDialog.Builder(requireActivity())
-        alertDialogBuilder.setMessage("${gameRequest?.requesterName} would like to play SPS")
+        alertDialogBuilder.setMessage("${gameRequest?.requesterName} is sending game request")
             .setTitle("Game Request")
             .setPositiveButton("Ok") { dialog, _ ->
                 dialog.dismiss()
@@ -105,11 +107,18 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
     }
 
     private fun decline() {
-        playerRequestReference.child("ack").setValue(false)
+        playerRequestReference!!.child("ack").setValue(false)
     }
 
     private fun sendAck() {
-        playerRequestReference.child("ack").setValue(true)
+        val gamesRef = FirebaseDatabase.getInstance().getReference("games")
+        val newGame = gamesRef.push()
+
+        println("newGame.key: ${newGame.key}")
+        playerRequestReference!!.child("gameId").setValue(newGame.key)
+            .addOnCompleteListener {
+                playerRequestReference!!.child("ack").setValue(true)
+            }
     }
 
     private fun fetchOnlinePlayers() {
@@ -124,7 +133,8 @@ class ChoosePlayerFragment : Fragment(), ItemClickListener, ChildEventListener,
 
     override fun onStop() {
         super.onStop()
-        playerRequestReference?.removeEventListener(reqListener)
+        if (playerRequestReference != null)
+            playerRequestReference?.removeEventListener(reqListener)
     }
 
     override fun onDestroy() {

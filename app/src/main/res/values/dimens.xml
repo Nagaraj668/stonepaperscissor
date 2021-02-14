@@ -4,4 +4,10 @@
     <dimen name="dp10">10dp</dimen>
     <dimen name="sp18">18sp</dimen>
     <dimen name="dp15">15dp</dimen>
+    <dimen name="dp25">25dp</dimen>
+    <dimen name="dp50">50dp</dimen>
+    <dimen name="sp22">22sp</dimen>
+    <dimen name="dp2">2dp</dimen>
+    <dimen name="dp1">1dp</dimen>
+    <dimen name="dp60">60dp</dimen>
 </resources>
